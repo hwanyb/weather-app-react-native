@@ -1,11 +1,41 @@
+import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
+import * as Location from "expo-location";
 
 export default function App() {
+  const key = "AIzaSyAdYjmk_Ed-gX1szPlsRp1HVad5su3gCkw";
+  const [location, setLocation] = useState([]);
+  const [ok, setOk] = useState(true);
+  const ask = async () => {
+    Location.setGoogleApiKey(key);
+    const { granted } = await Location.requestForegroundPermissionsAsync();
+    if (!granted) {
+      setOk(false);
+    }
+    const {
+      coords: { latitude, longitude },
+    } = await Location.getCurrentPositionAsync({ accuracy: 5 });
+    const userLocation = await Location.reverseGeocodeAsync(
+      { latitude, longitude },
+      { useGoogleMaps: false }
+    );
+
+    // console.log(userLocation[0].city);
+    setLocation([userLocation[0].city, userLocation[0].region, userLocation[0].country])
+  };
+
+  useEffect(() => {
+    ask();
+  }, []);
+
   return (
     <View style={styles.container}>
-      <View style={styles.city}>
-        <Text style={styles.cityText}>Seoul</Text>
+      <StatusBar animated={true} style="dark" />
+      <View style={styles.header}>
+        <Text style={styles.city}>{location[0]}</Text>
+        <Text style={styles.regionAndCountry}>{location[1]}, {location[2]}</Text>
+        <Text style={styles.date}>Fri Jan 18</Text>
       </View>
       <View style={styles.weather}>
         <View style={styles.day}>
@@ -48,12 +78,22 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  city: {
+  header: {
     flex: 3,
+    paddingTop: 100,
   },
-  cityText: {
-    fontSize: 26,
-    fontWeight: 600,
+  date: {
+    fontSize: 18,
+    fontWeight: "300",
+  },
+  city: {
+    fontSize: 40,
+    fontWeight: "700",
+  },
+  regionAndCountry: {
+    fontWeight:"400",
+    marginBottom:28,
+    fontSize:20,
   },
   weather: {
     flex: 3,
@@ -62,31 +102,31 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   temp: {
-    fontSize: 100,
-    fontWeight: 700,
+    fontSize: 120,
+    fontWeight: "700",
   },
   desc: {
     fontSize: 24,
-    fontWeight: 100,
+    fontWeight: "300",
   },
 
   weekWrapper: {
     flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
-    borderTopColor:"#000",
-    borderTopWidth:2,
+    borderTopColor: "#000",
+    borderTopWidth: 2,
   },
   week: {
     flex: 1,
-    marginTop:10,
+    marginTop: 10,
   },
   weekTemp: {
     fontSize: 22,
-    fontWeight: 500,
+    fontWeight: "500",
   },
   weekDesc: {
     fontSize: 13,
-    fontWeight: 100,
+    fontWeight: "300",
   },
 });
