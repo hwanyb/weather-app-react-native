@@ -1,10 +1,38 @@
 import React, { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, ScrollView } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  ImageBackground,
+} from "react-native";
 import * as Location from "expo-location";
+import { Fontisto, FontAwesome5 } from "@expo/vector-icons";
 
 const GOOGLE_API_KEY = "AIzaSyAdYjmk_Ed-gX1szPlsRp1HVad5su3gCkw";
 const WEATHER_API_KEY = "3e41232ce3c0a011d11888cf8f244fef";
+
+const image = { uri: "http://openweathermap.org/img/wn/10d@2x.png" };
+
+const icons = {
+  Clouds: "cloudy",
+  Clear: "day-sunny",
+  Atmosphere: "fog",
+  Snow: "snow",
+  Rain: "rains",
+  Drizzle: "rain",
+  Thunderstorm: "lightnings",
+};
+const iconsColor = {
+  Clouds: "#8d9aa6",
+  Clear: "#ffd900",
+  Atmosphere: "#3f576e",
+  Snow: "#9cceff",
+  Rain: "#7ba1d1",
+  Drizzle: "#7ba1d1",
+  Thunderstorm: "#050096",
+};
 
 export default function App() {
   const [location, setLocation] = useState([]);
@@ -64,6 +92,14 @@ export default function App() {
               {new Date(current?.dt * 1000).toString().substring(0, 10)}
             </Text>
           </View>
+          <View style={styles.currentIconWrapper}>
+            <Fontisto
+              style={styles.currentIcon}
+              name={icons[daily[0]?.weather[0]?.main]}
+              size={300}
+              color={iconsColor[daily[0]?.weather[0]?.main]}
+            />
+          </View>
           <View style={styles.weather}>
             <View style={styles.current}>
               <View style={styles.currentWeater}>
@@ -75,17 +111,32 @@ export default function App() {
                   {currentWeather[0]?.description}
                 </Text>
               </View>
-              {/* {daily.map((day, index) => (
-                <View style={styles.maxMinTemp} key={index}>
-                  <Text style={styles.maxMinTempText}>
-                    ⬆ {day?.temp?.max}℃
-                  </Text>
-                  <Text style={styles.maxMinTempText}>⬇ 18℃</Text>
-                </View>
-              ))} */}
               <View style={styles.maxMinTemp}>
-                <Text style={styles.maxMinTempText}>⬆  {Math.ceil(daily[0]?.temp?.max)}℃</Text>
-                <Text style={styles.maxMinTempText}>⬇  {Math.ceil(daily[0]?.temp?.min)}℃</Text>
+                <View style={styles.maxMinTempBox}>
+                  <FontAwesome5
+                    name='long-arrow-alt-up'
+                    size={20}
+                    color='black'
+                    style={styles.arrowIcon}
+                  />
+                  <Text style={styles.maxMinTempText}>
+                    {Math.ceil(daily[0]?.temp?.max)}℃
+                  </Text>
+                </View>
+                <View style={styles.maxMinTempBox}>
+                  <FontAwesome5
+                    name='long-arrow-alt-down'
+                    size={20}
+                    color='black'
+                    style={styles.arrowIcon}
+                  />
+                  <Text style={styles.maxMinTempText}>
+                    {Math.ceil(daily[0]?.temp?.min)}℃
+                  </Text>
+                </View>
+                {/* <Text style={styles.maxMinTempText}>
+                  ⬇ {Math.ceil(daily[0]?.temp?.min)}℃
+                </Text> */}
               </View>
             </View>
             <ScrollView
@@ -103,6 +154,14 @@ export default function App() {
                       {Math.ceil(day?.temp?.day)}
                     </Text>
                     <Text>℃</Text>
+                  </View>
+                  <View style={styles.weekIconWrapper}>
+                    <Fontisto
+                      style={styles.weekIcon}
+                      name={icons[day?.weather[0]?.main]}
+                      size={30}
+                      color={iconsColor[day?.weather[0]?.main]}
+                    />
                   </View>
                   <Text style={styles.weekDesc}>{day?.weather[0]?.main}</Text>
                 </View>
@@ -131,27 +190,34 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   header: {
-    flex: 3,
-    paddingTop: 80,
+    flex: 1.5,
+    paddingTop: 50,
+    alignSelf: "flex-end",
   },
   date: {
-    fontSize: 24,
+    textAlign: "right",
+
+    fontSize: 28,
     fontWeight: "300",
   },
   city: {
+    textAlign: "right",
     fontSize: 40,
+
     fontWeight: "700",
   },
   regionAndCountry: {
+    textAlign: "right",
+
     fontWeight: "600",
     marginBottom: 28,
     fontSize: 20,
   },
   weather: {
-    flex: 2.5,
+    flex: 1.5,
   },
   current: {
-    flex: 2,
+    flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
   },
@@ -162,7 +228,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   temp: {
-    fontSize: 120,
+    fontSize: 135,
     fontWeight: "700",
   },
   unit: {
@@ -178,38 +244,60 @@ const styles = StyleSheet.create({
   },
   maxMinTemp: {
     paddingVertical: 25,
-    paddingBottom: 40,
+    paddingBottom: 30,
     justifyContent: "space-between",
   },
+  maxMinTempBox: {
+    textAlign: "right",
+    flexDirection: "row",
+    lineHeight: 22,
+    alignContent: "center",
+  },
   maxMinTempText: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "300",
   },
   weekWrapper: {
     borderTopColor: "#000",
-    borderTopWidth: 2,
+    borderTopWidth: 1,
+    marginTop: 20,
+    flex: 1,
   },
   week: {
-    flex: 1,
-    marginTop: 10,
-    marginRight: 20,
+    marginTop: 20,
+    marginRight: 30,
     alignContent: "center",
     alignItems: "center",
   },
   weekDate: {
     fontSize: 20,
     fontWeight: "300",
+    marginBottom: 10,
   },
   weekTempWrapper: {
     flexDirection: "row",
+    marginBottom: 10,
   },
 
   weekTemp: {
     fontSize: 24,
     fontWeight: "500",
   },
+  weekIconWrapper: {
+    marginBottom: 10,
+  },
+  weekIcon: {},
   weekDesc: {
     fontSize: 18,
     fontWeight: "400",
+  },
+  currentIconWrapper: {
+    position: "absolute",
+    top: 150,
+    left: -70,
+  },
+  currentIcon: {},
+  arrowIcon: {
+    marginRight: 10,
   },
 });
